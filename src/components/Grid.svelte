@@ -1,17 +1,11 @@
 <script lang="ts">
   import Cell from "./Cell.svelte";
-  import { getGrid, setGrid } from "../services/storageService";
+  import { setGrid } from "../services/storageService";
+  import { grid, currentCell, currentLine } from "../stores/stores";
 
-  let size = 15; // 15 x 15 for a standard weekday puzzle
-  let grid =
-    getGrid() ||
-    Array.from({ length: size * size }, () => ({
-      letter: "",
-      isBlackSquare: false,
-      number: "",
-    }));
-  let currentCell;
-  let currentLine: number[] = [];
+  // The size of a standard NYT Puzzle
+  const size = 15;
+
   // acrossAxis is a boolean to determine current writing direction
   let acrossAxis = true;
 
@@ -19,22 +13,34 @@
 
   let mouseDown = false;
 
-  const handleDoubleClick = (cellNumber) => {
-    const cellIsBlack = grid[cellNumber].isBlackSquare;
+  const updateGridCell = (cellNumber, cellProps) => {
+    // console.log(`Params: cellNumber: ${cellNumber}, letter: ${cellProps.letter}, number: ${cellProps.number}, isBlackSquare: ${cellProps.isBlackSquare}`);
+    grid.update(tempGrid => {
+      tempGrid = $grid;
+      tempGrid.splice(cellNumber, 1, {
+      letter: cellProps.letter !== null ? cellProps.letter : tempGrid[cellNumber].letter,
+      isBlackSquare: cellProps.isBlackSquare !== null ? cellProps.isBlackSquare : tempGrid[cellNumber].isBlackSquare,
+      number: cellProps.number !== null ? cellProps.number : tempGrid[cellNumber].number,
+    });
+    // console.log("GRID[CC] is now:", tempGrid[cellNumber]);
+    return tempGrid;
+    });
+  }
 
-    grid.splice(cellNumber, 1, {
-      letter: "",
-      isBlackSquare: !cellIsBlack,
+  const changeCellFill = (cellNumber) => {
+    const cellIsBlack = $grid[cellNumber].isBlackSquare;
+
+    const newData = { 
+      letter: "", 
       number: "",
-    });
-    grid.splice(grid.length - 1 - cellNumber, 1, {
-      letter: "",
-      isBlackSquare: !cellIsBlack,
-      number: "",
-    });
-    grid = grid;
-    currentLine = determineCurrentLine();
-    setGrid(grid);
+      isBlackSquare: !cellIsBlack
+    };
+    
+    updateGridCell(cellNumber, newData);
+    updateGridCell($grid.length - 1 - cellNumber, newData);
+
+    currentLine.set(determineCurrentLine());
+    setGrid($grid);
   };
 
   const determineCurrentLine = () => {
@@ -45,25 +51,28 @@
     let min;
     let max;
     for (let i = 0; i < size * inc; i += inc) {
-      if (min == undefined) {
+      if (min == undefined) { 
         // Min boundary conditions
         if (
           acrossAxis
-            ? getCol(currentCell - i) === 0
-            : getRow(currentCell - i) === 0
+            ? getCol($currentCell - i) === 0
+            : getRow($currentCell - i) === 0
         )
-          min = currentCell - i;
-        else if (grid[currentCell - i].isBlackSquare) min = currentCell - i;
+          min = $currentCell - i;
+        else if ($grid[$currentCell - i].isBlackSquare) min = $currentCell - i;
       }
       if (max == undefined) {
         // Max boundary conditions
         if (
           acrossAxis
-            ? getCol(currentCell + i) === size - 1
-            : getRow(currentCell + i) === size - 1
-        )
-          max = currentCell + i;
-        else if (grid[currentCell + i].isBlackSquare) max = currentCell + i;
+            ? getCol($currentCell + i) === size - 1
+            : getRow($currentCell + i) === size - 1
+        ) {
+          max = $currentCell + i;
+        }
+        else if ($grid[$currentCell + i].isBlackSquare) {
+          max = $currentCell + i;
+        }
       }
     }
     let potentialLine = [];
@@ -78,9 +87,18 @@
     acrossAxis = !acrossAxis;
   };
 
+  const handleClick = (cellNumber) => {
+    setCurrentCell(cellNumber);
+    setTimeout(function() {
+      if(mouseDown) {
+        changeCellFill(cellNumber);
+      }
+    }, 200);
+  }
+
   const setCurrentCell = (cellNumber: number) => {
-    currentCell = mod(cellNumber, size * size);
-    currentLine = determineCurrentLine();
+    currentCell.set(mod(cellNumber, size * size));
+    currentLine.set(determineCurrentLine());
   };
 
   const mod = (m, n) => {
@@ -89,10 +107,12 @@
 
   // moveRight: move(0,1), moveLeft: move(0,-1), moveUp: move(0,-size), moveDown: move(0,size)
   const move = (acc, inc) => {
-    if (grid[mod(currentCell + acc + inc, size * size)].isBlackSquare) {
+    if ($grid[mod($currentCell + acc + inc, size * size)].isBlackSquare) {
       move(acc + inc, inc);
+    } else if ($currentCell + acc + inc <= 0) {
+      setCurrentCell(0);
     } else {
-      setCurrentCell(currentCell + acc + inc);
+      setCurrentCell($currentCell + acc + inc);
     }
   };
 
@@ -127,17 +147,17 @@
 
   const handleBackSpace = () => {
     if (deleteMode) {
-      grid[currentCell] = { ...grid[currentCell], letter: "" };
+      updateGridCell($currentCell, {...$grid[$currentCell], letter: ""});
       move(0, acrossAxis ? -1 : -size);
-    } else if (grid[currentCell].letter) {
-      grid[currentCell] = { ...grid[currentCell], letter: "" };
+    } else if ($grid[$currentCell].letter) {
+      updateGridCell($currentCell, {...$grid[$currentCell], letter: ""});
     } else move(0, acrossAxis ? -1 : -size);
     deleteMode = true;
-    setGrid(grid);
+    setGrid($grid);
   };
 
   const handleKeyDown = (event) => {
-    if (grid[currentCell].isBlackSquare) {
+    if ($grid[$currentCell].isBlackSquare) {
       acrossAxis ? move(0, 1) : move(0, size);
     }
 
@@ -152,9 +172,9 @@
 
     if (key >= A_CODE && key <= Z_CODE) {
       deleteMode = false;
-      grid[currentCell] = { ...grid[currentCell], letter: event.key };
+      updateGridCell($currentCell, {...$grid[$currentCell], letter: event.key})
       move(0, acrossAxis ? 1 : size);
-      setGrid(grid);
+      setGrid($grid);
     } else if (key === B_SPACE) {
       handleBackSpace();
     } else if (key >= L_ARROW && key <= D_ARROW) {
@@ -164,17 +184,17 @@
       // Switch directionality
       deleteMode = false;
       flipAxis(event);
-      currentLine = determineCurrentLine();
+      currentLine.set(determineCurrentLine());
     } else if (key === SPACE) {
       deleteMode = false;
-      handleDoubleClick(currentCell);
+      changeCellFill($currentCell);
       move(0, acrossAxis ? 1 : size);
     }
   };
 
   const handleMouseOver = (cellNumber) => {
     if (mouseDown) {
-      handleDoubleClick(cellNumber);
+      changeCellFill(cellNumber);
     }
   };
 </script>
@@ -185,18 +205,17 @@
     on:mousedown={() => (mouseDown = true)}
     on:mouseup={() => (mouseDown = false)}
   >
-    {#each grid as cellContent, i}
+    {#each $grid as cellContent, i}
       <div
         class="cell"
-        on:dblclick={() => handleDoubleClick(i)}
-        on:click={() => setCurrentCell(i)}
+        on:mousedown={() => handleClick(i)}
         on:keydown={(e) => handleKeyDown(e)}
         on:mouseover={() => handleMouseOver(i)}
       >
         <Cell
           {cellContent}
-          currentCell={currentCell === i}
-          inCurrentLine={currentLine.includes(i)}
+          currentCell={$currentCell === i}
+          inCurrentLine={$currentLine.includes(i)}
         />
       </div>
     {/each}
