@@ -5,14 +5,12 @@
 
   // The size of a standard NYT Puzzle
   const size = 15;
-
   // acrossAxis is a boolean to determine current writing direction
   let acrossAxis = true;
-
   let deleteMode = false;
-
   let mouseDown = false;
 
+  // Grid update functions ////////////////////////////////////////
   const updateGridCell = (cellNumber, cellProps) => {
     // console.log(`Params: cellNumber: ${cellNumber}, letter: ${cellProps.letter}, number: ${cellProps.number}, isBlackSquare: ${cellProps.isBlackSquare}`);
     grid.update(tempGrid => {
@@ -82,30 +80,17 @@
     return potentialLine;
   };
 
-  const flipAxis = (e) => {
-    e.preventDefault();
-    acrossAxis = !acrossAxis;
-  };
-
-  const handleClick = (cellNumber) => {
-    setCurrentCell(cellNumber);
-    setTimeout(function() {
-      if(mouseDown) {
-        changeCellFill(cellNumber);
-      }
-    }, 200);
-  }
-
   const setCurrentCell = (cellNumber: number) => {
     currentCell.set(mod(cellNumber, size * size));
     currentLine.set(determineCurrentLine());
   };
 
-  const mod = (m, n) => {
-    return ((m % n) + n) % n;
+  const flipAxis = (e) => {
+    e.preventDefault();
+    acrossAxis = !acrossAxis;
   };
 
-  // moveRight: move(0,1), moveLeft: move(0,-1), moveUp: move(0,-size), moveDown: move(0,size)
+    // moveRight: move(0,1), moveLeft: move(0,-1), moveUp: move(0,-size), moveDown: move(0,size)
   const move = (acc, inc) => {
     if ($grid[mod($currentCell + acc + inc, size * size)].isBlackSquare) {
       move(acc + inc, inc);
@@ -115,6 +100,16 @@
       setCurrentCell($currentCell + acc + inc);
     }
   };
+
+  // Event handling functions ////////////////////////////////////////
+  const handleClick = (cellNumber) => {
+    setCurrentCell(cellNumber);
+    setTimeout(function() {
+      if(mouseDown) {
+        changeCellFill(cellNumber);
+      }
+    }, 200);
+  }
 
   const handleArrow = (direction) => {
     const L_ARROW = 37;
@@ -197,37 +192,36 @@
       changeCellFill(cellNumber);
     }
   };
+
+  // Helper functions ////////////////////////////////////////////////
+  const mod = (m, n) => {
+    return ((m % n) + n) % n;
+  };
+  
 </script>
 
-<div class="container">
-  <div
-    class="grid"
-    on:mousedown={() => (mouseDown = true)}
-    on:mouseup={() => (mouseDown = false)}
-  >
-    {#each $grid as cellContent, i}
-      <div
-        class="cell"
-        on:mousedown={() => handleClick(i)}
-        on:keydown={(e) => handleKeyDown(e)}
-        on:mouseover={() => handleMouseOver(i)}
-      >
-        <Cell
-          {cellContent}
-          currentCell={$currentCell === i}
-          inCurrentLine={$currentLine.includes(i)}
-        />
-      </div>
-    {/each}
-  </div>
+<div
+  class="grid"
+  on:mousedown={() => (mouseDown = true)}
+  on:mouseup={() => (mouseDown = false)}
+>
+  {#each $grid as cellContent, i}
+    <div
+      class="cell"
+      on:mousedown={() => handleClick(i)}
+      on:keydown={(e) => handleKeyDown(e)}
+      on:mouseover={() => handleMouseOver(i)}
+    >
+      <Cell
+        {cellContent}
+        currentCell={$currentCell === i}
+        inCurrentLine={$currentLine.includes(i)}
+      />
+    </div>
+  {/each}
 </div>
 
 <style>
-  .container {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-  }
 
   .grid {
     display: flex;
