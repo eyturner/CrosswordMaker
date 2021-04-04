@@ -23,6 +23,11 @@
     };
 </script>
 
+<div class="container">
+    <button id="big-button" on:click={() => handleClick()}
+        >Show me some words!</button
+    >
+</div>
 {#if wordOptions}
     <div class="word-container">
         {#each wordOptions as wordOption}
@@ -31,12 +36,6 @@
                 <p>{wordOption.defs[0]}</p>
             </div>
         {/each}
-    </div>
-{:else}
-    <div class="container">
-        <button id="big-button" on:click={() => handleClick()}
-            >Show me some words!</button
-        >
     </div>
 {/if}
 
