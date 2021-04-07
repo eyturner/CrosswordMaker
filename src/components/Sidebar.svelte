@@ -1,5 +1,5 @@
 <script>
-    import { currentLine, grid } from "../stores/stores";
+    import { currentLine, grid, currentCell } from "../stores/stores";
     import { getWordOptions } from "../services/dictionaryService";
 
     let wordOptions;
@@ -20,6 +20,7 @@
         const newWordOptions = await getWordOptions(getCurrentLineLetters());
         console.log(newWordOptions);
         wordOptions = newWordOptions;
+        currentCell.set(-1);
     };
 
     const setGridLine = (wordOption) => {
