@@ -2,10 +2,12 @@
 	import Grid from "./components/Grid.svelte";
 	import Navbar from "./components/Navbar.svelte";
 	import Sidebar from "./components/Sidebar.svelte";
+	import Subheader from "./components/Subheader.svelte";
 </script>
 
 <main>
 	<Navbar />
+	<Subheader />
 	<div class="container">
 		<Grid />
 		<Sidebar />

@@ -1,10 +1,8 @@
 <script lang="ts">
   import Cell from "./Cell.svelte";
   import { setGrid } from "../services/storageService";
-  import { grid, currentCell, currentLine } from "../stores/stores";
+  import { grid, currentCell, currentLine, size } from "../stores/stores";
 
-  // The size of a standard NYT Puzzle
-  const size = 15;
   // acrossAxis is a boolean to determine current writing direction
   let acrossAxis = true;
   let deleteMode = false;
@@ -13,27 +11,36 @@
   // Grid update functions ////////////////////////////////////////
   const updateGridCell = (cellNumber, cellProps) => {
     // console.log(`Params: cellNumber: ${cellNumber}, letter: ${cellProps.letter}, number: ${cellProps.number}, isBlackSquare: ${cellProps.isBlackSquare}`);
-    grid.update(tempGrid => {
+    grid.update((tempGrid) => {
       tempGrid = $grid;
       tempGrid.splice(cellNumber, 1, {
-      letter: cellProps.letter !== null ? cellProps.letter : tempGrid[cellNumber].letter,
-      isBlackSquare: cellProps.isBlackSquare !== null ? cellProps.isBlackSquare : tempGrid[cellNumber].isBlackSquare,
-      number: cellProps.number !== null ? cellProps.number : tempGrid[cellNumber].number,
+        letter:
+          cellProps.letter !== null
+            ? cellProps.letter
+            : tempGrid[cellNumber].letter,
+        isBlackSquare:
+          cellProps.isBlackSquare !== null
+            ? cellProps.isBlackSquare
+            : tempGrid[cellNumber].isBlackSquare,
+        number:
+          cellProps.number !== null
+            ? cellProps.number
+            : tempGrid[cellNumber].number,
+      });
+      // console.log("GRID[CC] is now:", tempGrid[cellNumber]);
+      return tempGrid;
     });
-    // console.log("GRID[CC] is now:", tempGrid[cellNumber]);
-    return tempGrid;
-    });
-  }
+  };
 
   const changeCellFill = (cellNumber) => {
     const cellIsBlack = $grid[cellNumber].isBlackSquare;
 
-    const newData = { 
-      letter: "", 
+    const newData = {
+      letter: "",
       number: "",
-      isBlackSquare: !cellIsBlack
+      isBlackSquare: !cellIsBlack,
     };
-    
+
     updateGridCell(cellNumber, newData);
     updateGridCell($grid.length - 1 - cellNumber, newData);
 
@@ -49,7 +56,7 @@
     let min;
     let max;
     for (let i = 0; i < size * inc; i += inc) {
-      if (min == undefined) { 
+      if (min == undefined) {
         // Min boundary conditions
         if (
           acrossAxis
@@ -67,8 +74,7 @@
             : getRow($currentCell + i) === size - 1
         ) {
           max = $currentCell + i;
-        }
-        else if ($grid[$currentCell + i].isBlackSquare) {
+        } else if ($grid[$currentCell + i].isBlackSquare) {
           max = $currentCell + i;
         }
       }
@@ -90,7 +96,7 @@
     acrossAxis = !acrossAxis;
   };
 
-    // moveRight: move(0,1), moveLeft: move(0,-1), moveUp: move(0,-size), moveDown: move(0,size)
+  // moveRight: move(0,1), moveLeft: move(0,-1), moveUp: move(0,-size), moveDown: move(0,size)
   const move = (acc, inc) => {
     if ($grid[mod($currentCell + acc + inc, size * size)].isBlackSquare) {
       move(acc + inc, inc);
@@ -104,12 +110,12 @@
   // Event handling functions ////////////////////////////////////////
   const handleClick = (cellNumber) => {
     setCurrentCell(cellNumber);
-    setTimeout(function() {
-      if(mouseDown) {
+    setTimeout(function () {
+      if (mouseDown) {
         changeCellFill(cellNumber);
       }
     }, 200);
-  }
+  };
 
   const handleArrow = (direction) => {
     const L_ARROW = 37;
@@ -142,10 +148,10 @@
 
   const handleBackSpace = () => {
     if (deleteMode) {
-      updateGridCell($currentCell, {...$grid[$currentCell], letter: ""});
+      updateGridCell($currentCell, { ...$grid[$currentCell], letter: "" });
       move(0, acrossAxis ? -1 : -size);
     } else if ($grid[$currentCell].letter) {
-      updateGridCell($currentCell, {...$grid[$currentCell], letter: ""});
+      updateGridCell($currentCell, { ...$grid[$currentCell], letter: "" });
     } else move(0, acrossAxis ? -1 : -size);
     deleteMode = true;
     setGrid($grid);
@@ -167,7 +173,10 @@
 
     if (key >= A_CODE && key <= Z_CODE) {
       deleteMode = false;
-      updateGridCell($currentCell, {...$grid[$currentCell], letter: event.key})
+      updateGridCell($currentCell, {
+        ...$grid[$currentCell],
+        letter: event.key,
+      });
       move(0, acrossAxis ? 1 : size);
       setGrid($grid);
     } else if (key === B_SPACE) {
@@ -197,7 +206,6 @@
   const mod = (m, n) => {
     return ((m % n) + n) % n;
   };
-  
 </script>
 
 <div
@@ -222,7 +230,6 @@
 </div>
 
 <style>
-
   .grid {
     display: flex;
     flex-direction: row;
