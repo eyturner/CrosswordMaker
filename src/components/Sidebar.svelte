@@ -1,18 +1,17 @@
-<script>
+<script lang="ts">
     import { currentLine, grid, currentCell } from "../stores/stores";
     import { getWordOptions } from "../services/dictionaryService";
+    import WordOption from "./WordOption.svelte";
 
     let wordOptions;
 
     const getCurrentLineLetters = () => {
-        console.log;
         let letterArr = [];
         $currentLine.forEach((cellNumber) => {
             if (!$grid[cellNumber].isBlackSquare) {
                 letterArr.push($grid[cellNumber]);
             }
         });
-        console.log("YOUR LETTER ARRAY:", letterArr);
         return letterArr;
     };
 
@@ -21,10 +20,6 @@
         console.log(newWordOptions);
         wordOptions = newWordOptions;
         currentCell.set(-1);
-    };
-
-    const setGridLine = (wordOption) => {
-        console.log("UPDATING GRID NOW! :D");
     };
 </script>
 
@@ -35,13 +30,7 @@
     {#if wordOptions}
         <div class="word-container">
             {#each wordOptions as wordOption}
-                <div
-                    class="word"
-                    on:click={(wordOption) => setGridLine(wordOption)}
-                >
-                    <p><strong>{wordOption.word}</strong></p>
-                    <p>{"\n" + wordOption.defs[0].slice(2)}</p>
-                </div>
+                <WordOption {wordOption} />
             {/each}
         </div>
     {/if}
@@ -61,11 +50,5 @@
         border: 1px solid black;
         padding: 5px;
         border-radius: 5px;
-    }
-
-    .word {
-        border: 1px solid grey;
-        margin: 5px 0px;
-        padding: 5px;
     }
 </style>
