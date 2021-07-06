@@ -1,11 +1,16 @@
 <script lang="ts">
     import { currentLine, grid, currentCell } from "../stores/stores";
 
+    interface Word {
+        defs: Array<string>;
+        word: string;
+    }
+
     export let wordOption;
     let definitionNum = 0;
     $: currentDef = formatDefinition(wordOption.defs[definitionNum]);
 
-    const formatDefinition = (definition) => {
+    const formatDefinition = (definition: string) => {
         if (definition) {
             const NOUN = "n";
             const VERB = "v";
@@ -31,7 +36,7 @@
         }
     };
 
-    const setGridLine = (wordOption) => {
+    const setGridLine = (wordOption: Word) => {
         const letters = wordOption.word;
         for (let i = 0; i < letters.length; i++) {
             updateGridCell($currentLine[i], {
@@ -41,7 +46,7 @@
         }
     };
 
-    const updateCurrentDef = (change) => {
+    const updateCurrentDef = (change: number) => {
         currentDef = wordOption.defs[definitionNum + change];
         definitionNum += change;
     };
