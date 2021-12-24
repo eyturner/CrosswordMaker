@@ -1,5 +1,6 @@
 <script lang="ts">
     import { currentLine, grid, currentCell } from "../stores/stores";
+    import Cell from "./Cell.svelte";
 
     interface Word {
         defs: Array<string>;
@@ -36,13 +37,25 @@
         }
     };
 
+    /*
+    This next function is broken into two parts to deal with black squares being treated as writeable
+*/
     const setGridLine = (wordOption: Word) => {
         const letters = wordOption.word;
-        for (let i = 0; i < letters.length; i++) {
-            updateGridCell($currentLine[i], {
-                ...$grid[$currentLine[i]],
-                letter: letters[i],
-            });
+        if ($grid[$currentLine[0]].isBlackSquare) {
+            for (let i = 1; i <= letters.length; i++) {
+                updateGridCell($currentLine[i], {
+                    ...$grid[$currentLine[i]],
+                    letter: letters[i - 1],
+                });
+            }
+        } else {
+            for (let i = 0; i < letters.length; i++) {
+                updateGridCell($currentLine[i], {
+                    ...$grid[$currentLine[i]],
+                    letter: letters[i],
+                });
+            }
         }
     };
 
