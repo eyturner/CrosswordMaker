@@ -17,7 +17,6 @@
 
     const handleClick = async () => {
         const newWordOptions = await getWordOptions(getCurrentLineLetters());
-        console.log(newWordOptions);
         wordOptions = newWordOptions;
         currentCell.set(-1);
     };

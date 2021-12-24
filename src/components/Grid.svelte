@@ -10,7 +10,6 @@
 
     // Grid update functions ////////////////////////////////////////
     const updateGridCell = (cellNumber, cellProps) => {
-        // console.log(`Params: cellNumber: ${cellNumber}, letter: ${cellProps.letter}, number: ${cellProps.number}, isBlackSquare: ${cellProps.isBlackSquare}`);
         grid.update(() => {
             let tempGrid = $grid;
             tempGrid.splice(cellNumber, 1, {

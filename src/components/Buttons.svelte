@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { grid, size } from "../stores/stores";
+    import { grid, SIZE } from "../stores/stores";
     import Cell from "./Cell.svelte";
 
     const onExport = () => {
@@ -7,7 +7,6 @@
     };
 
     const updateGridCell = (cellNumber, cellProps) => {
-        // console.log(`Params: cellNumber: ${cellNumber}, letter: ${cellProps.letter}, number: ${cellProps.number}, isBlackSquare: ${cellProps.isBlackSquare}`);
         grid.update(() => {
             let tempGrid = $grid;
             tempGrid.splice(cellNumber, 1, {
@@ -32,20 +31,19 @@
         if ($grid[cellNumber].letter == "") {
             return false;
         } else if (
-            cellNumber % size == 0 ||
+            cellNumber % SIZE == 0 ||
             $grid[cellNumber - 1].isBlackSquare
         ) {
             return true;
         } else if (
-            cellNumber - size < 0 ||
-            $grid[cellNumber - size].isBlackSquare
+            cellNumber - SIZE < 0 ||
+            $grid[cellNumber - SIZE].isBlackSquare
         ) {
             return true;
         }
     };
 
     const onGenerateNumbers = () => {
-        console.log($grid);
         let currentNumber = 1;
         for (let i = 0; i < $grid.length; ++i) {
             if (cellGetsNumber(i)) {

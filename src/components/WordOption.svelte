@@ -38,7 +38,8 @@
     };
 
     /*
-    This next function is broken into two parts to deal with black squares being treated as writeable
+    This next function is broken into two parts to deal
+    with black squares being treated as writeable
 */
     const setGridLine = (wordOption: Word) => {
         const letters = wordOption.word;
