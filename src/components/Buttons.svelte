@@ -31,23 +31,23 @@
         if ($grid[cellNumber].letter == "") {
             return false;
         } else if (
-        // Check if across
+            // Check if across
             cellNumber % SIZE == 0 ||
             $grid[cellNumber - 1].isBlackSquare
         ) {
             return true;
         } else if (
-        // Check if down
+            // Check if down
             cellNumber - SIZE < 0 ||
             $grid[cellNumber - SIZE].isBlackSquare
         ) {
-           return true;
+            return true;
         }
     };
 
     // This function should only be called after ensuring that the cell gets
     // a number
-    const createClue = (cellNumber: int) => {
+    const createClue = (cellNumber: number) => {
         // First find whether the tile should be across, down, or both
         let across: boolean = false;
         let down: boolean = false;
@@ -55,15 +55,16 @@
         // If the grid is a black square, no clue needed.
         if ($grid[cellNumber].isBlackSquare) {
             return;
-        }
-
-        else {
-        // Check across
+        } else {
+            // Check across
             if (cellNumber % SIZE == 0 || $grid[cellNumber - 1].isBlackSquare) {
-                across = true; 
+                across = true;
             }
-        // Check down
-            if (cellNumber - SIZE < 0 || $grid[cellNumber - SIZE].isBlackSquare) {
+            // Check down
+            if (
+                cellNumber - SIZE < 0 ||
+                $grid[cellNumber - SIZE].isBlackSquare
+            ) {
                 down = true;
             }
         }
@@ -74,14 +75,14 @@
             let tempClues = $clues;
             let clueNumber = $grid[cellNumber].number;
             if (across) {
-               tempClues.across[clueNumber] = "";  
+                tempClues.across[clueNumber] = "";
             }
             if (down) {
                 tempClues.down[clueNumber] = "";
             }
             return tempClues;
-        })
-    }
+        });
+    };
 
     const onGenerateNumbers = () => {
         let currentNumber = 1;
@@ -92,12 +93,12 @@
                     number: currentNumber,
                 };
                 updateGridCell(i, newData);
-                createClue(i)
+                createClue(i);
                 currentNumber += 1;
             }
         }
 
-        console.log("Clues is now:", $clues)
+        console.log("Clues is now:", $clues);
     };
 </script>
 

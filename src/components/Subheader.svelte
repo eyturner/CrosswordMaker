@@ -1,5 +1,11 @@
 <script lang="ts">
-    import { currentLine, grid, currentCell, SIZE } from "../stores/stores";
+    import {
+        currentLine,
+        grid,
+        currentCell,
+        clues,
+        SIZE,
+    } from "../stores/stores";
     import { setGrid } from "../services/storageService";
 
     const handleClear = () => {
@@ -10,6 +16,11 @@
                 number: "",
             }))
         );
+
+        clues.set({
+            across: {},
+            down: {},
+        });
         currentCell.set(null);
         currentLine.set([]);
         setGrid($grid);
