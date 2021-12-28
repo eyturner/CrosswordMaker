@@ -1,19 +1,24 @@
 <script lang="ts">
     import { clues, grid } from "../stores/stores";
+    import { setClues } from "../services/storageService";
 
     const updateClue = (event, direction, number) => {
         // Update the clue
         console.log(event);
-        const key = event.keycode;
+        const key = event.key;
         clues.update(() => {
             let tempClues = $clues;
-            tempClues[direction][number] = key;
+            tempClues[direction][number] += key;
             return tempClues;
         });
     };
 
-    //TODO: create saving service for clues && dipslay clues at beginning if they exist.
-    // Potential: use on:blur as event to save current clues
+    const saveClues = (event, direction, number) => {
+        console.log(event);
+        clues.update(() => {
+            let tempClues = $clues;
+        });
+    };
 </script>
 
 <div class="clueContainer">
@@ -27,7 +32,7 @@
                     id="clueNum"
                     placeholder="Clue for {clueNum} across"
                     class="clue"
-                    on:keydown={(event) => updateClue(event, "across", clueNum)}
+                    on:blur={(event) => saveClues(event, "across", clueNum)}
                 />
             </div>
         {/each}
@@ -42,7 +47,7 @@
                     id="clueNum"
                     placeholder="Clue for {clueNum} down"
                     class="clue"
-                    on:keydown={(event) => updateClue(event, "down", clueNum)}
+                    on:blur={(event) => saveClues(event, "down", clueNum)}
                 />
             </div>
         {/each}

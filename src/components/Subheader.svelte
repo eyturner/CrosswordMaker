@@ -6,7 +6,7 @@
         clues,
         SIZE,
     } from "../stores/stores";
-    import { setGrid } from "../services/storageService";
+    import { setGrid, setClues } from "../services/storageService";
 
     const handleClear = () => {
         grid.set(
@@ -24,6 +24,7 @@
         currentCell.set(null);
         currentLine.set([]);
         setGrid($grid);
+        setClues($clues);
     };
 </script>
 

@@ -1,6 +1,6 @@
 <script lang="ts">
     import { grid, clues, SIZE } from "../stores/stores";
-    import Cell from "./Cell.svelte";
+    import { setGrid } from "../services/storageService";
 
     const onExport = () => {
         console.log("Exporting...");
@@ -98,7 +98,7 @@
             }
         }
 
-        console.log("Clues is now:", $clues);
+        setGrid($grid);
     };
 </script>
 
