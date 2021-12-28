@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { grid, SIZE } from "../stores/stores";
+    import { grid, clues, SIZE } from "../stores/stores";
     import Cell from "./Cell.svelte";
 
     const onExport = () => {
@@ -31,17 +31,56 @@
         if ($grid[cellNumber].letter == "") {
             return false;
         } else if (
+        // Check if across
             cellNumber % SIZE == 0 ||
             $grid[cellNumber - 1].isBlackSquare
         ) {
             return true;
         } else if (
+        // Check if down
             cellNumber - SIZE < 0 ||
             $grid[cellNumber - SIZE].isBlackSquare
         ) {
-            return true;
+           return true;
         }
     };
+
+    // This function should only be called after ensuring that the cell gets
+    // a number
+    const createClue = (cellNumber: int) => {
+        // First find whether the tile should be across, down, or both
+        let across: boolean = false;
+        let down: boolean = false;
+
+        if ($grid[cellNumber].isBlackSquare) {
+            return;
+        }
+
+        else {
+        // Check across
+            if (cellNumber % SIZE == 0 || $grid[cellNumber - 1].isBlackSquare) {
+                across = true; 
+            }
+        // Check down
+            if (cellNumber - SIZE < 0 || $grid[cellNumber - SIZE].isBlackSquare) {
+                down = true;
+            }
+        }
+
+        // Update $clues accordingly: if across or down, add that number to
+        // the object and create a blank string as the clue.
+        clues.update(() => {
+            let tempClues = $clues;
+            let clueNumber = $grid[cellNumber].number;
+            if (across) {
+               tempClues.across[clueNumber] = "";  
+            }
+            if (down) {
+                tempClues.down[clueNumber] = "";
+            }
+            return tempClues;
+        })
+    }
 
     const onGenerateNumbers = () => {
         let currentNumber = 1;
@@ -52,9 +91,12 @@
                     number: currentNumber,
                 };
                 updateGridCell(i, newData);
+                createClue(i)
                 currentNumber += 1;
             }
         }
+
+        console.log("Clues is now:", $clues)
     };
 </script>
 
