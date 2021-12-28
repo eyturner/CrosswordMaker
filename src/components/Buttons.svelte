@@ -52,6 +52,7 @@
         let across: boolean = false;
         let down: boolean = false;
 
+        // If the grid is a black square, no clue needed.
         if ($grid[cellNumber].isBlackSquare) {
             return;
         }
