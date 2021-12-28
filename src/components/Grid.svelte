@@ -1,7 +1,7 @@
 <script lang="ts">
     import Cell from "./Cell.svelte";
     import { setGrid } from "../services/storageService";
-    import { grid, currentCell, currentLine, size } from "../stores/stores";
+    import { grid, currentCell, currentLine, SIZE } from "../stores/stores";
 
     // acrossAxis is a boolean to determine current writing direction
     let acrossAxis = true;
@@ -47,13 +47,13 @@
     };
 
     const determineCurrentLine = () => {
-        const getRow = (cellNumber) => Math.floor(cellNumber / size);
-        const getCol = (cellNumber) => cellNumber % size;
-        const inc = acrossAxis ? 1 : size;
+        const getRow = (cellNumber) => Math.floor(cellNumber / SIZE);
+        const getCol = (cellNumber) => cellNumber % SIZE;
+        const inc = acrossAxis ? 1 : SIZE;
 
         let min: number;
         let max: number;
-        for (let i = 0; i < size * inc; i += inc) {
+        for (let i = 0; i < SIZE * inc; i += inc) {
             if (min == undefined) {
                 // Min boundary conditions
                 if (
@@ -69,8 +69,8 @@
                 // Max boundary conditions
                 if (
                     acrossAxis
-                        ? getCol($currentCell + i) === size - 1
-                        : getRow($currentCell + i) === size - 1
+                        ? getCol($currentCell + i) === SIZE - 1
+                        : getRow($currentCell + i) === SIZE - 1
                 ) {
                     max = $currentCell + i;
                 } else if ($grid[$currentCell + i].isBlackSquare) {
@@ -86,7 +86,7 @@
     };
 
     const setCurrentCell = (cellNumber: number) => {
-        currentCell.set(mod(cellNumber, size * size));
+        currentCell.set(mod(cellNumber, SIZE * SIZE));
         currentLine.set(determineCurrentLine());
     };
 
@@ -95,9 +95,9 @@
         acrossAxis = !acrossAxis;
     };
 
-    // moveRight: move(0,1), moveLeft: move(0,-1), moveUp: move(0,-size), moveDown: move(0,size)
+    // moveRight: move(0,1), moveLeft: move(0,-1), moveUp: move(0,-SIZE), moveDown: move(0,SIZE)
     const move = (acc, inc) => {
-        if ($grid[mod($currentCell + acc + inc, size * size)].isBlackSquare) {
+        if ($grid[mod($currentCell + acc + inc, SIZE * SIZE)].isBlackSquare) {
             move(acc + inc, inc);
         } else if ($currentCell + acc + inc <= 0) {
             setCurrentCell(0);
@@ -127,7 +127,7 @@
                 move(0, -1);
                 break;
             case U_ARROW:
-                move(0, -size);
+                move(0, -SIZE);
                 break;
 
             // Right or Down Movement
@@ -136,7 +136,7 @@
                 break;
 
             case D_ARROW:
-                move(0, size);
+                move(0, SIZE);
                 break;
 
             default:
@@ -151,20 +151,20 @@
                 ...$grid[$currentCell],
                 letter: "",
             });
-            move(0, acrossAxis ? -1 : -size);
+            move(0, acrossAxis ? -1 : -SIZE);
         } else if ($grid[$currentCell].letter) {
             updateGridCell($currentCell, {
                 ...$grid[$currentCell],
                 letter: "",
             });
-        } else move(0, acrossAxis ? -1 : -size);
+        } else move(0, acrossAxis ? -1 : -SIZE);
         deleteMode = true;
         setGrid($grid);
     };
 
     const handleKeyDown = (event: any) => {
         if ($grid[$currentCell].isBlackSquare) {
-            acrossAxis ? move(0, 1) : move(0, size);
+            acrossAxis ? move(0, 1) : move(0, SIZE);
         }
 
         const A_CODE = 65;
@@ -182,7 +182,7 @@
                 ...$grid[$currentCell],
                 letter: event.key,
             });
-            move(0, acrossAxis ? 1 : size);
+            move(0, acrossAxis ? 1 : SIZE);
             setGrid($grid);
         } else if (key === B_SPACE) {
             handleBackSpace();
@@ -197,7 +197,7 @@
         } else if (key === SPACE) {
             deleteMode = false;
             changeCellFill($currentCell);
-            move(0, acrossAxis ? 1 : size);
+            move(0, acrossAxis ? 1 : SIZE);
         }
     };
 
