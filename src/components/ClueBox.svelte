@@ -2,22 +2,14 @@
     import { clues, grid } from "../stores/stores";
     import { setClues } from "../services/storageService";
 
-    const updateClue = (event, direction, number) => {
-        // Update the clue
-        console.log(event);
-        const key = event.key;
+    const saveClues = (event, direction, number) => {
+        let newClue = event.target.value;
         clues.update(() => {
             let tempClues = $clues;
-            tempClues[direction][number] += key;
+            tempClues[direction][number] = newClue;
             return tempClues;
         });
-    };
-
-    const saveClues = (event, direction, number) => {
-        console.log(event);
-        clues.update(() => {
-            let tempClues = $clues;
-        });
+        setClues($clues);
     };
 </script>
 
@@ -32,7 +24,8 @@
                     id="clueNum"
                     placeholder="Clue for {clueNum} across"
                     class="clue"
-                    on:blur={(event) => saveClues(event, "across", clueNum)}
+                    value={$clues.across[clueNum]}
+                    on:keyup={(event) => saveClues(event, "across", clueNum)}
                 />
             </div>
         {/each}
@@ -47,7 +40,7 @@
                     id="clueNum"
                     placeholder="Clue for {clueNum} down"
                     class="clue"
-                    on:blur={(event) => saveClues(event, "down", clueNum)}
+                    on:keyup={(event) => saveClues(event, "down", clueNum)}
                 />
             </div>
         {/each}
@@ -58,8 +51,8 @@
     .clueContainer {
         display: flex;
         justify-content: center;
-        max-height: 50 vh;
         overflow: scroll;
+        margin-top: 5vh;
     }
 
     .clues {
@@ -76,6 +69,10 @@
         border-width: 0 0 2px;
         border-color: black;
         width: 35vw;
+    }
+
+    .clues > h5 {
+        margin: 0;
     }
 
     label {
