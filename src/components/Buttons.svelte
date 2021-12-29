@@ -1,6 +1,6 @@
 <script lang="ts">
     import { grid, clues, SIZE } from "../stores/stores";
-    import { setGrid } from "../services/storageService";
+    import { setGrid, setClues } from "../services/storageService";
 
     const onExport = () => {
         console.log("Exporting...");
@@ -97,7 +97,7 @@
                 currentNumber += 1;
             }
         }
-
+        setClues($clues);
         setGrid($grid);
     };
 </script>
