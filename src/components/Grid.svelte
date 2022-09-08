@@ -1,7 +1,8 @@
 <script lang="ts">
-    import Cell from "./Cell.svelte";
+    import CellBox from "./CellBox.svelte";
     import { setGrid } from "../services/storageService";
     import { grid, currentCell, currentLine, SIZE } from "../stores/stores";
+    import type { Cell } from "../common/types";
 
     // acrossAxis is a boolean to determine current writing direction
     let acrossAxis = true;
@@ -9,8 +10,8 @@
     let mouseDown = false;
 
     // Grid update functions ////////////////////////////////////////
-    const updateGridCell = (cellNumber, cellProps) => {
-        grid.update(() => {
+    const updateGridCell = (cellNumber: number, cellProps: Cell): void => {
+        grid.update((): Cell[] => {
             let tempGrid = $grid;
             tempGrid.splice(cellNumber, 1, {
                 letter:
@@ -30,10 +31,10 @@
         });
     };
 
-    const changeCellFill = (cellNumber) => {
+    const changeCellFill = (cellNumber: number): void => {
         const cellIsBlack = $grid[cellNumber].isBlackSquare;
 
-        const newData = {
+        const newData: Cell = {
             letter: "",
             number: "",
             isBlackSquare: !cellIsBlack,
@@ -46,9 +47,9 @@
         setGrid($grid);
     };
 
-    const determineCurrentLine = () => {
-        const getRow = (cellNumber) => Math.floor(cellNumber / SIZE);
-        const getCol = (cellNumber) => cellNumber % SIZE;
+    const determineCurrentLine = (): number[] => {
+        const getRow = (cellNumber: number) => Math.floor(cellNumber / SIZE);
+        const getCol = (cellNumber: number) => cellNumber % SIZE;
         const inc = acrossAxis ? 1 : SIZE;
 
         let min: number;
@@ -78,25 +79,25 @@
                 }
             }
         }
-        let potentialLine = [];
+        let potentialLine: number[] = [];
         for (let i = min; i <= max; i += inc) {
             potentialLine = potentialLine.concat(i);
         }
         return potentialLine;
     };
 
-    const setCurrentCell = (cellNumber: number) => {
+    const setCurrentCell = (cellNumber: number): void => {
         currentCell.set(mod(cellNumber, SIZE * SIZE));
         currentLine.set(determineCurrentLine());
     };
 
-    const flipAxis = (e) => {
-        e.preventDefault();
+    const flipAxis = (e): void => {
+        e.preventDefault(); // Needed to remain on current input element
         acrossAxis = !acrossAxis;
     };
 
     // moveRight: move(0,1), moveLeft: move(0,-1), moveUp: move(0,-SIZE), moveDown: move(0,SIZE)
-    const move = (acc, inc) => {
+    const move = (acc: number, inc: number): void => {
         if ($grid[mod($currentCell + acc + inc, SIZE * SIZE)].isBlackSquare) {
             move(acc + inc, inc);
         } else if ($currentCell + acc + inc <= 0) {
@@ -107,7 +108,7 @@
     };
 
     // Event handling functions ////////////////////////////////////////
-    const handleClick = (cellNumber) => {
+    const handleClick = (cellNumber: number): void => {
         setCurrentCell(cellNumber);
         setTimeout(function () {
             if (mouseDown) {
@@ -116,11 +117,11 @@
         }, 200);
     };
 
-    const handleArrow = (direction: number) => {
-        const L_ARROW = 37;
-        const U_ARROW = 38;
-        const R_ARROW = 39;
-        const D_ARROW = 40;
+    const handleArrow = (direction: number): void => {
+        const L_ARROW: number = 37;
+        const U_ARROW: number = 38;
+        const R_ARROW: number = 39;
+        const D_ARROW: number = 40;
         switch (direction) {
             // Left movement
             case L_ARROW:
@@ -145,7 +146,7 @@
         }
     };
 
-    const handleBackSpace = () => {
+    const handleBackSpace = (): void => {
         if (deleteMode) {
             updateGridCell($currentCell, {
                 ...$grid[$currentCell],
@@ -162,19 +163,19 @@
         setGrid($grid);
     };
 
-    const handleKeyDown = (event: any) => {
+    const handleKeyDown = (event: any): void => {
         if ($grid[$currentCell].isBlackSquare) {
             acrossAxis ? move(0, 1) : move(0, SIZE);
         }
 
-        const A_CODE = 65;
-        const Z_CODE = 90;
-        const B_SPACE = 8;
-        const L_ARROW = 37;
-        const D_ARROW = 40;
-        const TAB = 9;
-        const SPACE = 32;
-        const key = event.keyCode;
+        const A_CODE: number = 65;
+        const Z_CODE: number = 90;
+        const B_SPACE: number = 8;
+        const L_ARROW: number = 37;
+        const D_ARROW: number = 40;
+        const TAB: number = 9;
+        const SPACE: number = 32;
+        const key: number = event.keyCode;
 
         if (key >= A_CODE && key <= Z_CODE) {
             deleteMode = false;
@@ -201,14 +202,14 @@
         }
     };
 
-    const handleMouseOver = (cellNumber: number) => {
+    const handleMouseOver = (cellNumber: number): void => {
         if (mouseDown) {
             changeCellFill(cellNumber);
         }
     };
 
-    // Helper functions //////////////////
-    const mod = (m: number, n: number) => {
+    // Helper functions
+    const mod = (m: number, n: number): number => {
         return ((m % n) + n) % n;
     };
 </script>
@@ -225,7 +226,7 @@
             on:keydown={(e) => handleKeyDown(e)}
             on:mouseover={() => handleMouseOver(i)}
         >
-            <Cell
+            <CellBox
                 {cellContent}
                 currentCell={$currentCell === i}
                 inCurrentLine={$currentLine.includes(i)}

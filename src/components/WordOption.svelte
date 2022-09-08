@@ -1,17 +1,12 @@
 <script lang="ts">
     import { currentLine, grid, currentCell } from "../stores/stores";
-    import Cell from "./Cell.svelte";
+    import type { Word, Cell } from "../common/types";
 
-    interface Word {
-        defs: Array<string>;
-        word: string;
-    }
-
-    export let wordOption;
+    export let wordOption: Word;
     let definitionNum = 0;
     $: currentDef = formatDefinition(wordOption.defs[definitionNum]);
 
-    const formatDefinition = (definition: string) => {
+    const formatDefinition = (definition: string): string => {
         if (definition) {
             const NOUN = "n";
             const VERB = "v";
@@ -41,7 +36,7 @@
     This next function is broken into two parts to deal
     with black squares being treated as writeable
 */
-    const setGridLine = (wordOption: Word) => {
+    const setGridLine = (wordOption: Word): void => {
         const letters = wordOption.word;
         if ($grid[$currentLine[0]].isBlackSquare) {
             for (let i = 1; i <= letters.length; i++) {
@@ -60,13 +55,13 @@
         }
     };
 
-    const updateCurrentDef = (change: number) => {
+    const updateCurrentDef = (change: number): void => {
         currentDef = wordOption.defs[definitionNum + change];
         definitionNum += change;
     };
 
-    const updateGridCell = (cellNumber, cellProps) => {
-        grid.update(() => {
+    const updateGridCell = (cellNumber: number, cellProps: Cell) => {
+        grid.update((): Cell[] => {
             let tempGrid = $grid;
             tempGrid.splice(cellNumber, 1, {
                 letter:

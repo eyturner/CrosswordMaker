@@ -2,9 +2,15 @@
     import { clues, grid } from "../stores/stores";
     import { setClues } from "../services/storageService";
 
-    const saveClues = (event, direction, number) => {
-        let newClue = event.target.value;
-        clues.update(() => {
+    import type { Clues } from "../common/types";
+
+    const saveClues = (
+        event,
+        direction: string,
+        number: number | string
+    ): void => {
+        let newClue: string = event.target.value;
+        clues.update((): Clues => {
             let tempClues = $clues;
             tempClues[direction][number] = newClue;
             return tempClues;

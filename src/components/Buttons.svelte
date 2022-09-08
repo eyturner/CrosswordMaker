@@ -1,13 +1,14 @@
 <script lang="ts">
     import { grid, clues, SIZE } from "../stores/stores";
     import { setGrid, setClues } from "../services/storageService";
+    import type { Cell, Clues } from "../common/types";
 
-    const onExport = () => {
+    const onExport = (): void => {
         console.log("Exporting...");
     };
 
-    const updateGridCell = (cellNumber, cellProps) => {
-        grid.update(() => {
+    const updateGridCell = (cellNumber: number, cellProps: Cell): void => {
+        grid.update((): Cell[] => {
             let tempGrid = $grid;
             tempGrid.splice(cellNumber, 1, {
                 letter:
@@ -27,7 +28,7 @@
         });
     };
 
-    const cellGetsNumber = (cellNumber) => {
+    const cellGetsNumber = (cellNumber: number): boolean => {
         if ($grid[cellNumber].letter == "") {
             return false;
         } else if (
@@ -47,10 +48,10 @@
 
     // This function should only be called after ensuring that the cell gets
     // a number
-    const createClue = (cellNumber: number) => {
+    const createClue = (cellNumber: number): void => {
         // First find whether the tile should be across, down, or both
-        let across: boolean = false;
-        let down: boolean = false;
+        let across = false;
+        let down = false;
 
         // If the grid is a black square, no clue needed.
         if ($grid[cellNumber].isBlackSquare) {
@@ -71,7 +72,7 @@
 
         // Update $clues accordingly: if across or down, add that number to
         // the object and create a blank string as the clue.
-        clues.update(() => {
+        clues.update((): Clues => {
             let tempClues = $clues;
             let clueNumber = $grid[cellNumber].number;
             if (across) {
@@ -84,7 +85,7 @@
         });
     };
 
-    const onGenerateNumbers = () => {
+    const onGenerateNumbers = (): void => {
         let currentNumber = 1;
         for (let i = 0; i < $grid.length; ++i) {
             if (cellGetsNumber(i)) {

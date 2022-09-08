@@ -1,18 +1,19 @@
 <script lang="ts">
-    export let cellContent;
-    export let currentCell;
-    export let inCurrentLine;
+    import type { Cell } from "../common/types";
+    export let cellContent: Cell;
+    export let currentCell: boolean;
+    export let inCurrentLine: boolean;
 </script>
 
 <div
-    tabindex="-1"
-    class="{cellContent.isBlackSquare ? 'cell fill' : 'cell'} 
-        {inCurrentLine ? 'inCurrentLine' : ''}"
-    id={currentCell ? "currentCell" : ""}
->
-    <p class={cellContent.number ? "clueNumber" : "blankNumber"}>
+        tabindex="-1"
+        class="{cellContent.isBlackSquare ? 'cell fill' : 'cell'}
+                {inCurrentLine ? 'inCurrentLine' : ''}"
+        id={currentCell ? "currentCell" : ""}
+        >
+        <p class={cellContent.number ? "clueNumber" : "blankNumber"}>
         {cellContent.number || "."}
-    </p>
+        </p>
     <h3>
         {cellContent.letter}
     </h3>
@@ -67,7 +68,7 @@
         text-transform: uppercase;
     }
 
-    *:focus {
-        outline: none;
-    }
+*:focus {
+    outline: none;
+}
 </style>
