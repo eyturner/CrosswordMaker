@@ -1,3 +1,5 @@
+This *should* be hosted right here: https://glittery-twilight-b2588b.netlify.app/
+
 *Looking for a shareable component template? Go here --> [sveltejs/component-template](https://github.com/sveltejs/component-template)*
 
 ---
